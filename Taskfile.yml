@@ -51,7 +51,7 @@ tasks:
     env:
       TF_INPUT: "0"
       TF_IN_AUTOMATION: "1"
-      #TF_LOG: WARN
+      TF_LOG: trace
     cmds:
       - terraform init -get-plugins=false
       - terraform apply -auto-approve
