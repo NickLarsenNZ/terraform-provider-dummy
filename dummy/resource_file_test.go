@@ -16,6 +16,7 @@ const (
 	path            = "/tmp/something.txt"
 	firstline       = "alpha"
 	secondline      = "bravo"
+	thirdline       = "some_key: some_value" // todo: remove this after bug testing
 	dummyFileConfig = `
 		resource "dummy_file" "d" {
 			path       = "%s"
@@ -26,7 +27,7 @@ const (
 )
 
 func TestDummyResourceFile(t *testing.T) {
-	expectedContent := fmt.Sprintf("%s\n%s\n", firstline, secondline)
+	expectedContent := fmt.Sprintf("%s\n%s\n%s\n", firstline, secondline, thirdline)
 	renderedConfig := fmt.Sprintf(dummyFileConfig, path, firstline, secondline)
 
 	r.UnitTest(t, r.TestCase{
