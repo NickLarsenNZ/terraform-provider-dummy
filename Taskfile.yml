@@ -1,0 +1,57 @@
+version: '2'
+
+vars:
+  BIN: terraform-provider-dummy_v0.0.0
+  TERRAFORM_PLUGINS_DIR: ~/.terraform.d/plugins
+
+tasks:
+  build:
+    # Don't build if the sources haven't changed
+    sources:
+      - ./**/*.go
+      - go.mod
+      - go.sum
+    # Don't build if the generated file exists (and hasn't changed)
+    generates:
+      - "{{.BIN}}"
+    cmds:
+      - go build -o {{.BIN}}
+    silent: true
+
+  test:
+    sources:
+      - ./**/*.go
+      - go.mod
+      - go.sum
+    env:
+      TF_ACC: "1"
+      TF_LOG: trace
+    cmds:
+      - go test --parallel=1 -race -v ./...
+
+  update:
+    cmds:
+      - go get -u
+
+  validate:
+    deps: [build]
+    cmds:
+      - ./{{.BIN}}
+
+  install:
+    deps: [build]
+    cmds:
+      - mkdir -p {{.TERRAFORM_PLUGINS_DIR}}
+      - cp {{.BIN}} {{.TERRAFORM_PLUGINS_DIR}}
+    silent: true
+
+  example:
+    deps: [install]
+    dir: example
+    env:
+      TF_INPUT: "0"
+      TF_IN_AUTOMATION: "1"
+      #TF_LOG: WARN
+    cmds:
+      - terraform init -get-plugins=false
+      - terraform apply -auto-approve
